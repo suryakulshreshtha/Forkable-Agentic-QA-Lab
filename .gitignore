@@ -1,0 +1,37 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Secrets ---
+.env
+*.pem
+*.key
+
+# --- Playwright ---
+test-results/
+playwright-report/
+blob-report/
+
+# --- Allure / reports ---
+reports/*
+!reports/.gitkeep
+allure-results/
+allure-report/
+
+# --- SBOM output ---
+ci/sbom/*
+!ci/sbom/.gitkeep
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+
+# --- IDE ---
+.vscode/
+.idea/
