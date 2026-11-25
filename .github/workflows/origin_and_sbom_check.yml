@@ -1,0 +1,39 @@
+name: 🔒 Dependency origin & SBOM check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  origin-and-sbom:
+    name: Origin gate + SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Check out the repo
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 🔍 Run the non-Chinese dependency origin gate
+        run: python ci/origin_check.py
+
+      - name: 📦 Install pip-audit and cyclonedx-bom
+        run: pip install pip-audit cyclonedx-bom
+
+      - name: 🛡️ Vulnerability scan (pip-audit)
+        run: pip-audit --strict || true # advisory until the dependency set stabilizes in Phase 1
+
+      - name: 📋 Generate SBOM (CycloneDX)
+        run: |
+          mkdir -p ci/sbom
+          cyclonedx-py environment -o ci/sbom/sbom.json || echo "⚠️ No installed environment yet to scan — SBOM generation activates once dependencies are installed in this job."
+
+      - name: ⬆️ Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: ci/sbom/
